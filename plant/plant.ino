@@ -1,17 +1,30 @@
-/*Project Date: 16th November 2021
-
-  Project Summary:
-  - The following program takes multiple sensor inputs to automate watering the plant.
-  - The inputs are Soil Moisture, Temperature, Humidity and Sunlight.
-
-  List of User-defined Functions:
-  - checkMoisture()
-  - checkValve()
-  - setValveTime()
-  - getSensorValues()
-  - printSerial()
-
-*/
+/*****************************************************************************
+ * Brief Project Info:
+ * 
+ * This Arduino firmware is designed to interface with various sensors and
+ * control devices for an automated irrigation system. 
+ * 
+ * It reads data from a DHT11 temperature and humidity sensor, 
+ * a light sensor (photo-resistor), and a soil moisture sensor. 
+ * 
+ * The system controls a relay to activate a water pump based on soil moisture levels 
+ * and provides an override function using a button.
+ * 
+ * Sensor data and system status are communicated via the serial monitor.
+ * 
+ * User Defined Functions Used:
+ *  - checkMoisture(int moist): Check soil moisture and control valve.
+ *  - checkValve(unsigned long elapsedTime): Check and control the valve state.
+ *  - setValveTime(int humidity): Set the time duration for valve operation.
+ *  - buttonPressed(): Control valve override using a button press.
+ *  - getSensorValues(): Obtain sensor readings for temperature, humidity, light,
+ *    and soil moisture.
+ *  - printSerial(unsigned long elapsedTime): Print sensor data and valve status
+ *    to the serial monitor.
+ * 
+ * Original Date of Creation: 16 November 2021
+ * 
+ *****************************************************************************/
 
 // Adafruit library used to interface with DHT 11 Temperature and Humidity Sensor
 #include <Adafruit_Sensor.h>                
@@ -60,8 +73,7 @@ bool currentState = LOW;
 unsigned long prevTime = millis();          
 
 // Setup Function
-void setup()
-{
+void setup(){
   // Defining Light sensor pin as INPUT
     pinMode(LIGHT_SENSOR, INPUT);
   // Defining Relay pin as OUTPUT
@@ -77,8 +89,7 @@ void setup()
 }
 
 // Function to check Soil Moisture
-void checkMoisture(int moist)           
-{ 
+void checkMoisture(int moist){ 
   // Check if soil moisture is low; if low, turn on valve   
     if (moist > moistureThreshold)
     {
@@ -87,8 +98,7 @@ void checkMoisture(int moist)
 }
 
 // Function to check the Valve state and change it if necessary
-void checkValve(unsigned long elapsedTime)   
-{
+void checkValve(unsigned long elapsedTime){
   // Check if the valve needs to be opened, do so if required
     static unsigned long timeCounter = 0;
     if (valveState == HIGH)
@@ -107,15 +117,13 @@ void checkValve(unsigned long elapsedTime)
 }
 
 // Function to set the amount of time for which Valve is open
-void setValveTime(int humidity) 
-{
+void setValveTime(int humidity){
   // Check humidity level and map the values to time to keep valve open
     valveTime = map(humidity, 1, 100, 15000, 5000);
 }
 
 // Function to Open the Valve by using Override Button
-void buttonPressed()            
-{
+void buttonPressed(){
   // Open the valve if the button is pressed
     if (digitalRead(BUTTON))
     {
@@ -130,8 +138,7 @@ void buttonPressed()
 }
 
 // Function to obtain the sensor values
-void getSensorValues()
-{
+void getSensorValues(){
   // Get temperature in Celsius
     temperature = dht_sensor.readTemperature();                   
   // Get relative humidity percent (% in air)
@@ -141,14 +148,11 @@ void getSensorValues()
 
   // Obtain Soil moisture level (Dry Soil -> Higher value, Wet Soil -> Lower value)
   // For Reference: Sensor Reading in open air ~ 800 , Sensor Reading in freshly watered soil ~ 200 - 265                   
-    moisture = analogRead(MOISTURE_SENSOR);                      
-                                                              
+    moisture = analogRead(MOISTURE_SENSOR);                                                                                 
 }
 
 // Function to print the Sensor Values and Valve status on Serial Monitor
-void printSerial(unsigned long elapsedTime)     
-{
-  
+void printSerial(unsigned long elapsedTime){
     static unsigned long timeCounter = 0;
     int printInterval = 1000;
 
@@ -174,8 +178,7 @@ void printSerial(unsigned long elapsedTime)
 }
 
 // Loop Function (main)
-void loop()
-{ 
+void loop(){ 
     unsigned long elapsedTime = millis() - prevTime;
     prevTime = prevTime + elapsedTime;
 
